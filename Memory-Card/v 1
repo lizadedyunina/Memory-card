@@ -1,0 +1,132 @@
+#создай приложение для запоминания информации
+from PyQt5.QtCore import*
+from PyQt5.QtWidgets import*
+from random import*
+app = QApplication([])
+class Q():
+    def __init__(self, question,right,wrong1,wrong2,wrong3):
+        self.question = question
+        self.right = right
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+
+questions_list = list()
+questions_list.append(Q('Какой национальности нет?', 'Смурфы', 'Чульмцы', 'Энцы', 'Алеуты'))
+questions_list.append(Q('Какой океан самый большой?', 'Тихий', 'Атлантический', 'Любой', 'Не знаю'))
+
+Question  = QLabel('?')
+Button = QPushButton('Ответить')
+RadioGroupBox = QGroupBox('Варианты ответов:')
+btn_1 =  QRadioButton('Энцы')
+btn_2 =  QRadioButton('Чульмцы')
+btn_3 =  QRadioButton('Смурфы')
+btn_4 =  QRadioButton('Алеуты')
+RadioGroup = QButtonGroup()
+RadioGroup.addButton(btn_1)
+RadioGroup.addButton(btn_2)
+RadioGroup.addButton(btn_3)
+RadioGroup.addButton(btn_4)
+layout_q1 = QHBoxLayout()
+layout_q2 = QVBoxLayout()
+layout_q3 = QVBoxLayout()
+layout_q2.addWidget(btn_1)
+layout_q2.addWidget(btn_2)
+layout_q3.addWidget(btn_3)
+layout_q3.addWidget(btn_4)
+layout_q1.addLayout(layout_q2)
+layout_q1.addLayout(layout_q3)
+RadioGroupBox.setLayout(layout_q1)
+
+line_total1 = QHBoxLayout()
+line_total2 = QHBoxLayout()
+line_total3 = QHBoxLayout()
+line_total1.addWidget(Question,alignment = Qt.AlignCenter)
+line_total2.addWidget(RadioGroupBox)
+line_total3.addWidget(Button,alignment = Qt.AlignCenter)
+
+layout_card = QVBoxLayout()
+layout_card.addLayout(line_total1)
+layout_card.addLayout(line_total2)
+layout_card.addLayout(line_total3)
+Button = QPushButton('Следующий вопрос')
+AnsGroupBox = QGroupBox('Результат')
+Correct = QLabel('Верно/неверно')
+Answer = QLabel('Правильный ответ')
+layout_res = QVBoxLayout()
+layout_res.addWidget(Correct,alignment=Qt.AlignTop)
+layout_res.addWidget(Answer,alignment=Qt.AlignCenter)
+AnsGroupBox.setLayout(layout_res)
+
+line_ans1= QHBoxLayout()
+line_ans2= QHBoxLayout()
+line_ans3= QHBoxLayout()
+line_ans1.addWidget(Question,alignment=Qt.AlignCenter)
+line_ans2.addWidget(AnsGroupBox)
+line_ans2.addWidget(RadioGroupBox)
+RadioGroupBox.hide()
+line_ans3.addWidget(Button)
+layout_card = QVBoxLayout()
+layout_card.addLayout(line_ans1)
+layout_card.addLayout(line_ans2)
+layout_card.addLayout(line_ans3)
+def show_result():
+    RadioGroupBox.hide()
+    AnsGroupBox.show()
+    Button.setText('Следующий вопрос')
+def show_question():
+    RadioGroupBox.show()
+    AnsGroupBox.hide()
+    Button.setText('Ответить')
+    RadioGroup.setExclusive(False)
+    btn_1.setChecked(False)
+    btn_2.setChecked(False)
+    btn_3.setChecked(False)
+    btn_4.setChecked(False)
+    RadioGroup.setExclusive(True)
+answers = [btn_1,btn_2,btn_3,btn_4]
+def ask(q:Q):
+    shuffle(answers)
+    answers[0].setText(q.right)
+    answers[1].setText(q.wrong1)
+    answers[2].setText(q.wrong2)
+    answers[3].setText(q.wrong3)
+    Question.setText(q.question)
+    Answer.setText(q.right)
+    show_question()
+def show_correct(res):
+    Correct.setText(res)
+    show_result()
+def check_correct():
+    if answers[0].isChecked():
+        win.true_q +=1
+        show_correct('Ты прав!!')
+        print('Статистика:')
+        print('Всего вопросов:',win.total)
+        print('Количество правильных ответов:',win.true_q)
+        print('Рейтинг:',win.true_q/win.total*100)
+    else:
+        if answers[1].isChecked() or answers[2].isChecked() or answers[3].isChecked():
+            show_correct('Ты неправ!')
+            print('Статистика:')
+            print('Всего вопросов:',win.total)
+            print('Количество правильных ответов:',win.true_q)
+            print('Рейтинг:',win.true_q/win.total*100)
+def next_question():
+    win.total +=1 
+    cur_question = randint(0, len(questions_list)-1)
+    q =questions_list[cur_question]
+    ask(q)
+def click(): 
+    if Button.text()== 'Ответить':
+        check_correct()
+    else:
+        next_question()
+win = QWidget()
+win.total = 0 
+win.true_q = 0 
+win.setLayout(layout_card)
+Button.clicked.connect(click)
+next_question()
+win.show()
+app.exec_()``
